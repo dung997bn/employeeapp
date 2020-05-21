@@ -1,14 +1,47 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, Modal } from "react-native";
+import { StyleSheet, Text, View, Modal, Alert } from "react-native";
 import { TextInput, Button } from "react-native-paper";
+import * as ImagePicker from "expo-image-picker";
+import Constants from "expo-constants";
+import * as Permissions from "expo-permissions";
 
- const CreateEmployee = () => {
+const CreateEmployee = () => {
   const [Name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [salary, setSalary] = useState("");
   const [picture, setPicture] = useState("");
   const [modal, setModal] = useState(false);
+
+  const pickFromGallery = async () => {
+    const { granted } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+    if (granted) {
+      let data = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.5,
+      });
+      console.log(data);
+    } else {
+      Alert.alert("you need to give up permission to work");
+    }
+  };
+
+  const pickFromCamera = async () => {
+    const { granted } = await Permissions.askAsync(Permissions.CAMERA);
+    if (granted) {
+      let data = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.5,
+      });
+      console.log(data);
+    } else {
+      Alert.alert("you need to give up permission to work");
+    }
+  };
 
   return (
     <View style={styles.root}>
@@ -75,7 +108,7 @@ import { TextInput, Button } from "react-native-paper";
               icon="camera"
               style={styles.inputStyles}
               mode="contained"
-              onPress={() => setModal(false)}
+              onPress={() => pickFromCamera()}
             >
               Camera
             </Button>
@@ -83,7 +116,7 @@ import { TextInput, Button } from "react-native-paper";
               icon="image-area"
               mode="contained"
               style={styles.inputStyles}
-              onPress={() => setModal(false)}
+              onPress={() => pickFromGallery()}
             >
               Gallery
             </Button>
@@ -120,6 +153,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#b8e6ff",
   },
 });
-
 
 export default CreateEmployee;
